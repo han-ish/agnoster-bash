@@ -7,10 +7,7 @@
 # (Converted from ZSH theme by Kenny Root)
 # https://gist.github.com/kruton/8345450
 #
-# Updated & fixed by Erik Selberg erik@selberg.org 1/14/17
-# Tested on MacOSX, Ubuntu, Amazon Linux
-# Bash v3 and v4
-#
+# Updated virtualenv prompt by Hanish K H on oct-05-2017
 # # README
 #
 # In order for this theme to render correctly, you will need a
