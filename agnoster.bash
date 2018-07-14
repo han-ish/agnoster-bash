@@ -66,6 +66,7 @@ PROMPT_DIRTRIM=2 # bash4 and above
 
 ######################################################################
 DEBUG=0
+#DEBUG=1
 debug() {
     if [[ ${DEBUG} -ne 0 ]]; then
 	>&2 echo -e $*
@@ -103,8 +104,12 @@ fg_color() {
   	blue)    echo 34;;
   	magenta) echo 35;;
   	cyan)    echo 36;;
+  	#white)   echo 1\;37;;
   	white)   echo 37;;
     orange)  echo 38\;5\;166;;
+		dgreen)  echo 38\;5\;29;;
+		dblue)  echo 38\;5\;24;;
+		tim)  echo 1\;38\;5\;37;; # dark theme
     esac
 }
 
@@ -117,8 +122,12 @@ bg_color() {
   	blue)    echo 44;;
   	magenta) echo 45;;
   	cyan)    echo 46;;
+  	#white)   echo 1\;47;;
   	white)   echo 47;;
     orange)  echo 48\;5\;166;;
+		dgreen)  echo 48\;5\;29;;
+		dblue)   echo 48\;5\;24;;
+		tim)  echo 48\;5\;37;; # dark theme
     esac;
 }
 
@@ -161,7 +170,8 @@ prompt_segment() {
     # prompt_status - Erik 1/14/17
 
     #    if [[ -z $1 || ( -z $2 && $2 != default ) ]]; then
-    codes=("${codes[@]}" $(text_effect reset))
+    #codes=("${codes[@]}" $(text_effect reset))
+    codes=("${codes[@]}" $(text_effect bold))
     #    fi
     if [[ -n $1 ]]; then
 	bg=$(bg_color $1)
@@ -178,17 +188,20 @@ prompt_segment() {
 #    declare -p codes
 
     if [[ $CURRENT_BG != NONE && $1 != $CURRENT_BG ]]; then
-	declare -a intermediate=($(fg_color $CURRENT_BG) $(bg_color $1))
-	debug "pre prompt " $(ansi intermediate[@])
+	#declare -a intermediate=($(fg_color "$CURRENT_BG") $(bg_color "$1"))
+	declare -a intermediate=($(text_effect reset) $(fg_color "$CURRENT_BG") $(bg_color "$1"))
+	debug "pre prompt " "$(ansi intermediate[@])"
 	PR="$PR $(ansi intermediate[@])$SEGMENT_SEPARATOR"
-	debug "post prompt " $(ansi codes[@])
+  #echo "\033p32mhello world : ${intermediate[@]} \033[00m"
+	debug "post prompt " "$(ansi codes[@])"
 	PR="$PR$(ansi codes[@]) "
     else
 	debug "no current BG, codes is $codes[@]"
 	PR="$PR$(ansi codes[@]) "
     fi
     CURRENT_BG=$1
-    [[ -n $3 ]] && PR="$PR$3"
+  #echo "\033[32mhello worldd : ${intermediate[@]}\033[00m"
+		[[ -n $3 ]] && PR="$PR$3"
 }
 
 # End the prompt, closing any open segments
@@ -205,7 +218,8 @@ prompt_end() {
 ### virtualenv prompt
 prompt_virtualenv() {
   if [[ -n $VIRTUAL_ENV ]]; then
-    color=cyan
+    #color=cyan
+    color=dblue
     prompt_segment $color $PRIMARY_FG
     prompt_segment $color white "$(basename $VIRTUAL_ENV)"
   fi
@@ -244,9 +258,11 @@ prompt_git() {
 	dirty=$(git_status_dirty)
 	ref=$(git symbolic-ref HEAD 2> /dev/null) || ref="➦ $(git show-ref --head -s --abbrev |head -n1 2> /dev/null)"
 	if [[ -n $dirty ]]; then
-	    prompt_segment yellow black
+	    #prompt_segment yellow black
+	    prompt_segment yellow white
 	else
-	    prompt_segment green black
+	    #prompt_segment green black
+	    prompt_segment green white
 	fi
 	PR="$PR${ref/refs\/heads\// }$dirty "
     fi
@@ -254,7 +270,9 @@ prompt_git() {
 
 # Dir: current working directory
 prompt_dir() {
-    prompt_segment blue black '\w'
+    #prompt_segment blue black '\w'
+    prompt_segment cyan white '\w'
+    #prompt_segment black tim '\w' # dark theme
 }
 
 # Status:
@@ -268,7 +286,8 @@ prompt_status() {
     [[ $UID -eq 0 ]] && symbols+="$(ansi_single $(fg_color yellow))⚡"
     [[ $(jobs -l | wc -l) -gt 0 ]] && symbols+="$(ansi_single $(fg_color cyan))⚙"
 
-    [[ -n "$symbols" ]] && prompt_segment black default "$symbols"
+    #[[ -n "$symbols" ]] && prompt_segment black default "$symbols"
+		[[ -n "$symbols" ]] && prompt_segment black default "$symbols"
 }
 
 ######################################################################
@@ -350,6 +369,7 @@ prompt_right_segment() {
 #	$CURRENT_RBG=
 #    fi
     declare -a intermediate2=($(fg_color $1) $(bg_color $CURRENT_RBG) )
+    declare -a intermediate2=($(fg_color $1) $(bg_color $CURRENT_RBG) )
 #    PRIGHT="$PRIGHT---"
     debug "pre prompt " $(ansi_r intermediate2[@])
     PRIGHT="$PRIGHT$(ansi_r intermediate2[@])$RIGHT_SEPARATOR"
@@ -397,6 +417,7 @@ build_prompt() {
     prompt_dir
     prompt_git
     prompt_end
+
 }
 
 # from orig... 
@@ -414,7 +435,7 @@ set_bash_prompt() {
 
     # uncomment below to use right prompt
     #     PS1='\[$(tput sc; printf "%*s" $COLUMNS "$PRIGHT"; tput rc)\]'$PR
-    PS1=$PR
+    PS1="$PR"
 }
 
 PROMPT_COMMAND=set_bash_prompt
