@@ -104,6 +104,7 @@ fg_color() {
   	blue)    echo 34;;
   	magenta) echo 35;;
   	cyan)    echo 36;;
+  	#white)   echo 1\;37;;
   	white)   echo 37;;
     orange)  echo 38\;5\;166;;
 		dgreen)  echo 38\;5\;29;;
@@ -121,6 +122,7 @@ bg_color() {
   	blue)    echo 44;;
   	magenta) echo 45;;
   	cyan)    echo 46;;
+  	#white)   echo 1\;47;;
   	white)   echo 47;;
     orange)  echo 48\;5\;166;;
 		dgreen)  echo 48\;5\;29;;
@@ -186,9 +188,11 @@ prompt_segment() {
 #    declare -p codes
 
     if [[ $CURRENT_BG != NONE && $1 != $CURRENT_BG ]]; then
+	#declare -a intermediate=($(fg_color "$CURRENT_BG") $(bg_color "$1"))
 	declare -a intermediate=($(text_effect reset) $(fg_color "$CURRENT_BG") $(bg_color "$1"))
 	debug "pre prompt " "$(ansi intermediate[@])"
 	PR="$PR $(ansi intermediate[@])$SEGMENT_SEPARATOR"
+  #echo "\033p32mhello world : ${intermediate[@]} \033[00m"
 	debug "post prompt " "$(ansi codes[@])"
 	PR="$PR$(ansi codes[@]) "
     else
@@ -196,6 +200,7 @@ prompt_segment() {
 	PR="$PR$(ansi codes[@]) "
     fi
     CURRENT_BG=$1
+  #echo "\033[32mhello worldd : ${intermediate[@]}\033[00m"
 		[[ -n $3 ]] && PR="$PR$3"
 }
 
@@ -216,6 +221,7 @@ prompt_virtualenv() {
     #color=cyan
     color=dblue
     prompt_segment $color $PRIMARY_FG
+    #prompt_segment $color white "\033[38;5;136m✪ \033[$(fg_color white)m$(basename $VIRTUAL_ENV)"
     prompt_segment $color white "$(basename $VIRTUAL_ENV)"
   fi
 }
@@ -265,7 +271,7 @@ prompt_git() {
 
 # Dir: current working directory
 prompt_dir() {
-    #prompt_segment blue black '\w'
+    #prompt_segment blue white '\w'
     prompt_segment cyan white '\w'
     #prompt_segment black tim '\w' # dark theme
 }
@@ -412,7 +418,6 @@ build_prompt() {
     prompt_dir
     prompt_git
     prompt_end
-
 }
 
 # from orig... 
