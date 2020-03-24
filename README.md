@@ -7,7 +7,9 @@ A Powerline-inspired theme for BASH
 (Converted from ZSH theme by Kenny Root)
 https://gist.github.com/kruton/8345450
 
-Updated & fixed by millefalcon on oct-05-2017
+Updated with virtualenv support for python by [millefalcon](https://github.com/millefalcon)
+
+![alt screenshot](agnoster_bash_scr_shot.png)
 
 # UPDATE
 Fixed the virtualenv prompt in bash
